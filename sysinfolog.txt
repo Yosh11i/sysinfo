@@ -1,0 +1,154 @@
+======================================================================
+ADVANCED SYSTEM INFORMATION REPORT
+======================================================================
+Timestamp  : 2026-02-13 16:26:18.831241
+OS         : Linux 6.8.0-94-generic
+Hostname   : user1
+Machine    : x86_64
+CPU Model  : Intel(R) Core(TM) i5-2520M CPU @ 2.50GHz
+
+----------------------------------------------------------------------
+CPU STATUS
+----------------------------------------------------------------------
+Physical cores : 2
+Total cores    : 4
+CPU usage      : 1.5 %
+
+----------------------------------------------------------------------
+MEMORY STATUS
+----------------------------------------------------------------------
+Total     : 7.64 GB
+Available : 3.36 GB
+Used      : 4.28 GB
+Usage     : 56.0 %
+
+----------------------------------------------------------------------
+DISK USAGE
+----------------------------------------------------------------------
+/dev/sda3 (/)
+  Total: 1832.21 GB | Used: 454.60 GB | Free: 1284.46 GB | Usage: 26.1 %
+/dev/loop2 (/snap/bare/5)
+  Total: 0.00 GB | Used: 0.00 GB | Free: 0.00 GB | Usage: 100.0 %
+/dev/loop1 (/snap/android-studio/209)
+  Total: 1.46 GB | Used: 1.46 GB | Free: 0.00 GB | Usage: 100.0 %
+/dev/loop5 (/snap/copilot-desktop/56)
+  Total: 0.12 GB | Used: 0.12 GB | Free: 0.00 GB | Usage: 100.0 %
+/dev/loop3 (/snap/code/218)
+  Total: 0.32 GB | Used: 0.32 GB | Free: 0.00 GB | Usage: 100.0 %
+/dev/loop6 (/snap/copilot-desktop/62)
+  Total: 0.12 GB | Used: 0.12 GB | Free: 0.00 GB | Usage: 100.0 %
+/dev/loop0 (/snap/chatgpt-desktop-client/2)
+  Total: 0.09 GB | Used: 0.09 GB | Free: 0.00 GB | Usage: 100.0 %
+/dev/loop11 (/snap/core22/2216)
+  Total: 0.07 GB | Used: 0.07 GB | Free: 0.00 GB | Usage: 100.0 %
+/dev/loop4 (/snap/code/220)
+  Total: 0.32 GB | Used: 0.32 GB | Free: 0.00 GB | Usage: 100.0 %
+/dev/loop8 (/snap/core18/2979)
+  Total: 0.05 GB | Used: 0.05 GB | Free: 0.00 GB | Usage: 100.0 %
+/dev/loop7 (/snap/core18/2976)
+  Total: 0.05 GB | Used: 0.05 GB | Free: 0.00 GB | Usage: 100.0 %
+/dev/loop15 (/snap/firefox/7720)
+  Total: 0.25 GB | Used: 0.25 GB | Free: 0.00 GB | Usage: 100.0 %
+/dev/loop29 (/snap/snap-store/959)
+  Total: 0.01 GB | Used: 0.01 GB | Free: 0.00 GB | Usage: 100.0 %
+/dev/loop33 (/snap/snapd-desktop-integration/343)
+  Total: 0.00 GB | Used: 0.00 GB | Free: 0.00 GB | Usage: 100.0 %
+/dev/loop27 (/snap/postman/362)
+  Total: 0.17 GB | Used: 0.17 GB | Free: 0.00 GB | Usage: 100.0 %
+/dev/loop16 (/snap/firefox/7766)
+  Total: 0.25 GB | Used: 0.25 GB | Free: 0.00 GB | Usage: 100.0 %
+/dev/loop28 (/snap/snap-store/1216)
+  Total: 0.01 GB | Used: 0.01 GB | Free: 0.00 GB | Usage: 100.0 %
+/dev/loop23 (/snap/gtk-common-themes/1535)
+  Total: 0.09 GB | Used: 0.09 GB | Free: 0.00 GB | Usage: 100.0 %
+/dev/loop32 (/snap/snapd-desktop-integration/315)
+  Total: 0.00 GB | Used: 0.00 GB | Free: 0.00 GB | Usage: 100.0 %
+/dev/loop17 (/snap/gnome-3-28-1804/198)
+  Total: 0.16 GB | Used: 0.16 GB | Free: 0.00 GB | Usage: 100.0 %
+/dev/loop31 (/snap/snapd/25935)
+  Total: 0.05 GB | Used: 0.05 GB | Free: 0.00 GB | Usage: 100.0 %
+/dev/loop13 (/snap/core24/1267)
+  Total: 0.07 GB | Used: 0.07 GB | Free: 0.00 GB | Usage: 100.0 %
+/dev/loop14 (/snap/core24/1349)
+  Total: 0.07 GB | Used: 0.07 GB | Free: 0.00 GB | Usage: 100.0 %
+/dev/loop10 (/snap/core20/2686)
+  Total: 0.06 GB | Used: 0.06 GB | Free: 0.00 GB | Usage: 100.0 %
+/dev/loop12 (/snap/core22/2292)
+  Total: 0.07 GB | Used: 0.07 GB | Free: 0.00 GB | Usage: 100.0 %
+/dev/sda3 (/var/snap/firefox/common/host-hunspell)
+  Total: 1832.21 GB | Used: 454.60 GB | Free: 1284.46 GB | Usage: 26.1 %
+/dev/loop30 (/snap/snapd/25577)
+  Total: 0.05 GB | Used: 0.05 GB | Free: 0.00 GB | Usage: 100.0 %
+/dev/loop9 (/snap/core20/2682)
+  Total: 0.06 GB | Used: 0.06 GB | Free: 0.00 GB | Usage: 100.0 %
+/dev/loop24 (/snap/mesa-2404/1165)
+  Total: 0.39 GB | Used: 0.39 GB | Free: 0.00 GB | Usage: 100.0 %
+/dev/loop26 (/snap/postman/360)
+  Total: 0.17 GB | Used: 0.17 GB | Free: 0.00 GB | Usage: 100.0 %
+/dev/loop21 (/snap/gnome-46-2404/145)
+  Total: 0.65 GB | Used: 0.65 GB | Free: 0.00 GB | Usage: 100.0 %
+/dev/loop22 (/snap/gnome-46-2404/153)
+  Total: 0.59 GB | Used: 0.59 GB | Free: 0.00 GB | Usage: 100.0 %
+/dev/loop35 (/snap/zoom-client/275)
+  Total: 0.47 GB | Used: 0.47 GB | Free: 0.00 GB | Usage: 100.0 %
+/dev/loop20 (/snap/gnome-42-2204/247)
+  Total: 0.52 GB | Used: 0.52 GB | Free: 0.00 GB | Usage: 100.0 %
+/dev/loop25 (/snap/mesa-2404/912)
+  Total: 0.28 GB | Used: 0.28 GB | Free: 0.00 GB | Usage: 100.0 %
+/dev/loop34 (/snap/zoom-client/258)
+  Total: 0.44 GB | Used: 0.44 GB | Free: 0.00 GB | Usage: 100.0 %
+/dev/loop18 (/snap/gnome-3-38-2004/143)
+  Total: 0.34 GB | Used: 0.34 GB | Free: 0.00 GB | Usage: 100.0 %
+/dev/loop19 (/snap/gnome-42-2204/226)
+  Total: 0.50 GB | Used: 0.50 GB | Free: 0.00 GB | Usage: 100.0 %
+/dev/sda2 (/boot/efi)
+  Total: 0.50 GB | Used: 0.01 GB | Free: 0.49 GB | Usage: 1.2 %
+
+----------------------------------------------------------------------
+EXTENDED DISK HARDWARE INFO
+----------------------------------------------------------------------
+Device   Model                 Size    Type
+--------------------------------------------------
+loop0                           88.7M loop
+loop1                            1.5G loop
+loop2                              4K loop
+loop3                          332.2M loop
+loop4                          332.2M loop
+loop5                          120.4M loop
+loop6                            121M loop
+loop7                           55.5M loop
+loop8                           55.5M loop
+loop9                           63.8M loop
+loop10                          63.8M loop
+loop11                          73.9M loop
+loop12                            74M loop
+loop13                          66.8M loop
+loop14                          66.9M loop
+loop15                         251.7M loop
+loop16                         251.7M loop
+loop17                         164.8M loop
+loop18                         349.7M loop
+loop19                         516.2M loop
+loop20                         531.4M loop
+loop21                         669.8M loop
+loop22                         606.1M loop
+loop23                          91.7M loop
+loop24                           395M loop
+loop25                         290.8M loop
+loop26                         174.4M loop
+loop27                         174.5M loop
+loop28                          12.2M loop
+loop29                          12.3M loop
+loop30                          50.9M loop
+loop31                          48.1M loop
+loop32                           576K loop
+loop33                           576K loop
+loop34                         451.3M loop
+loop35                         484.1M loop
+sda    TOSHIBA MQ04ABD200        1.8T disk
+sr0    MATSHITA DVD+/-RW UJ8B2  1024M rom
+
+----------------------------------------------------------------------
+MEMORY MODULE INFO
+----------------------------------------------------------------------
+Memory module info detected (requires sudo)
