@@ -1,140 +1,159 @@
-import psutil
 import platform
 import socket
-import subprocess
+import psutil
 import os
+import subprocess
 from datetime import datetime
 
 
 # -------------------------------------------------
-# Utility Functions
+# Basic System Information
 # -------------------------------------------------
 
-def bytes_to_gb(value):
-    return value / (1024 ** 3)
-
-
-def run_command(command):
-    """Run system command safely and return output."""
-    try:
-        result = subprocess.check_output(
-            command,
-            shell=True,
-            stderr=subprocess.DEVNULL
-        )
-        return result.decode(errors="ignore").strip()
-    except Exception:
-        return None
-
-
-# -------------------------------------------------
-# OS Info
-# -------------------------------------------------
-
-def get_linux_pretty_name():
-    try:
-        with open("/etc/os-release") as f:
-            for line in f:
-                if line.startswith("PRETTY_NAME"):
-                    return line.split("=")[1].strip().strip('"')
-    except:
-        return None
-
-
-def get_os_info():
-    system = platform.system()
-    info = {
-        "os_name": system,
-        "release": platform.release(),
-        "version": platform.version(),
-        "kernel": platform.uname().release
+def get_basic_info():
+    return {
+        "Hostname": socket.gethostname(),
+        "Machine": platform.machine(),
+        "Processor": platform.processor(),
+        "Architecture": platform.architecture()[0],
+        "OS": platform.system(),
+        "OS Version": platform.version(),
+        "Kernel Version": platform.release()
     }
 
-    if system == "Linux":
-        pretty = get_linux_pretty_name()
-        if pretty:
-            info["pretty_name"] = pretty
+
+# -------------------------------------------------
+# CPU Information (Advanced)
+# -------------------------------------------------
+
+def get_cpu_info():
+    info = {}
+    info["Physical Cores"] = psutil.cpu_count(logical=False)
+    info["Logical Threads"] = psutil.cpu_count(logical=True)
+    info["CPU Usage (%)"] = psutil.cpu_percent(interval=1)
+
+    system = platform.system()
+
+    try:
+        if system == "Linux":
+            output = subprocess.check_output("lscpu", shell=True).decode()
+            for line in output.split("\n"):
+                if "Model name" in line:
+                    info["Model"] = line.split(":")[1].strip()
+                if "Socket(s)" in line:
+                    info["Sockets"] = line.split(":")[1].strip()
+
+        elif system == "Windows":
+            output = subprocess.check_output(
+                "wmic cpu get Name,NumberOfCores,NumberOfLogicalProcessors /format:list",
+                shell=True
+            ).decode(errors="ignore")
+
+            for line in output.split("\n"):
+                if "Name=" in line:
+                    info["Model"] = line.split("=")[1].strip()
+
+    except:
+        info["Model"] = "Unable to detect"
 
     return info
 
 
 # -------------------------------------------------
-# H/W Info
+# Memory Information
 # -------------------------------------------------
 
-def get_cpu_model():
+def get_memory_info():
+    vm = psutil.virtual_memory()
+
+    info = {
+        "Total (GB)": round(vm.total / (1024**3), 2),
+        "Available (GB)": round(vm.available / (1024**3), 2),
+        "Used (GB)": round(vm.used / (1024**3), 2),
+        "Usage (%)": vm.percent
+    }
+
     system = platform.system()
 
-    if system == "Linux":
-        output = run_command("grep 'model name' /proc/cpuinfo | head -1")
-        if output:
-            return output.split(":")[1].strip()
+    try:
+        if system == "Linux":
+            output = subprocess.check_output("dmidecode -t memory", shell=True).decode(errors="ignore")
+            for line in output.split("\n"):
+                if "Part Number:" in line and "Unknown" not in line:
+                    info["Part Number"] = line.split(":")[1].strip()
+                if "Speed:" in line and "Unknown" not in line:
+                    info["Speed"] = line.split(":")[1].strip()
 
-    elif system == "Windows":
-        output = run_command("wmic cpu get Name")
-        if output:
-            lines = output.splitlines()
-            if len(lines) > 1:
-                return lines[1].strip()
+        elif system == "Windows":
+            output = subprocess.check_output(
+                "wmic memorychip get PartNumber,Capacity,Speed /format:list",
+                shell=True
+            ).decode(errors="ignore")
 
-    return "Unknown"
+            for line in output.split("\n"):
+                if "PartNumber=" in line and line.strip():
+                    info["Part Number"] = line.split("=")[1].strip()
+                if "Speed=" in line and line.strip():
+                    info["Speed"] = line.split("=")[1].strip()
 
+    except:
+        pass
 
-def get_disk_info_extended():
-    system = platform.system()
-    lines = []
-
-    if system == "Linux":
-        output = run_command("lsblk -o NAME,MODEL,SIZE,TYPE -d")
-        if output:
-            lines.append("Device   Model                 Size    Type")
-            lines.append("-" * 70)
-            for line in output.splitlines()[1:]:
-                lines.append(line.strip())
-
-    elif system == "Windows":
-        output = run_command("wmic diskdrive get Model,SerialNumber,Size")
-        if output:
-            lines.append("Model                        SerialNumber        Size")
-            lines.append("-" * 80)
-            for line in output.splitlines()[1:]:
-                if line.strip():
-                    lines.append(line.strip())
-
-    if not lines:
-        lines.append("Extended disk info not available.")
-
-    return "\n".join(lines)
-
-
-def get_memory_modules():
-    system = platform.system()
-    lines = []
-
-    if system == "Linux":
-        output = run_command("dmidecode -t memory")
-        if output:
-            lines.append("Memory module information detected (sudo may be required).")
-        else:
-            lines.append("Memory module info requires sudo privileges.")
-
-    elif system == "Windows":
-        output = run_command("wmic memorychip get Manufacturer,PartNumber,Capacity,Speed")
-        if output:
-            lines.append("Manufacturer  PartNumber  Capacity  Speed")
-            lines.append("-" * 70)
-            for line in output.splitlines()[1:]:
-                if line.strip():
-                    lines.append(line.strip())
-
-    if not lines:
-        lines.append("Memory module info not available.")
-
-    return "\n".join(lines)
+    return info
 
 
 # -------------------------------------------------
-# NUMA Info (Linux Only)
+# Disk Information
+# -------------------------------------------------
+
+def get_disk_info():
+    disks = []
+    system = platform.system()
+
+    try:
+        if system == "Linux":
+            output = subprocess.check_output(
+                "lsblk -d -o NAME,MODEL,SIZE,ROTA", shell=True
+            ).decode()
+
+            lines = output.strip().split("\n")[1:]
+
+            for line in lines:
+                parts = line.split()
+                if len(parts) >= 4:
+                    disks.append({
+                        "Device": parts[0],
+                        "Model": parts[1],
+                        "Size": parts[2],
+                        "Type": "SSD" if parts[3] == "0" else "HDD"
+                    })
+
+        elif system == "Windows":
+            output = subprocess.check_output(
+                "wmic diskdrive get Model,Size,MediaType /format:list",
+                shell=True
+            ).decode(errors="ignore")
+
+            disk = {}
+            for line in output.split("\n"):
+                if "Model=" in line:
+                    disk["Model"] = line.split("=")[1].strip()
+                if "Size=" in line and line.strip():
+                    size = int(line.split("=")[1])
+                    disk["Size (GB)"] = round(size / (1024**3), 2)
+                if "MediaType=" in line:
+                    disk["Type"] = line.split("=")[1].strip()
+                    disks.append(disk)
+                    disk = {}
+
+    except:
+        disks.append({"Error": "Unable to detect disk info"})
+
+    return disks
+
+
+# -------------------------------------------------
+# NUMA Node Information (Linux Only)
 # -------------------------------------------------
 
 def get_numa_info():
@@ -148,149 +167,156 @@ def get_numa_info():
     if not os.path.exists(base_path):
         return "NUMA information not available."
 
-    nodes = [d for d in os.listdir(base_path) if d.startswith("node")]
+    nodes = sorted([d for d in os.listdir(base_path) if d.startswith("node")])
 
     if not nodes:
         return "No NUMA nodes detected."
 
     lines = []
 
-    for node in sorted(nodes):
-        meminfo_path = os.path.join(base_path, node, "meminfo")
-        cpulist_path = os.path.join(base_path, node, "cpulist")
+    for node in nodes:
+        node_path = os.path.join(base_path, node)
 
-        lines.append(node.upper())
-
-        # CPU list
         try:
-            with open(cpulist_path) as f:
+            with open(os.path.join(node_path, "cpulist")) as f:
                 cpus = f.read().strip()
+
+            meminfo_path = os.path.join(node_path, "meminfo")
+            total_mem = "Unknown"
+            free_mem = "Unknown"
+
+            if os.path.exists(meminfo_path):
+                with open(meminfo_path) as f:
+                    for line in f:
+                        if "MemTotal" in line:
+                            total_mem = round(int(line.split()[3]) / 1024, 2)
+                        if "MemFree" in line:
+                            free_mem = round(int(line.split()[3]) / 1024, 2)
+
+            lines.append(f"{node.upper()}")
             lines.append(f"  CPUs        : {cpus}")
-        except:
-            lines.append("  CPUs        : Unknown")
+            lines.append(f"  Total Memory: {total_mem} MB")
+            lines.append(f"  Free Memory : {free_mem} MB")
+            lines.append("")
 
-        # Memory info
-        try:
-            with open(meminfo_path) as f:
-                for line in f:
-                    if "MemTotal" in line:
-                        total_kb = int(line.split()[3])
-                        total_gb = total_kb / (1024 * 1024)
-                        lines.append(f"  Total Memory: {total_gb:.2f} GB")
-                    if "MemFree" in line:
-                        free_kb = int(line.split()[3])
-                        free_gb = free_kb / (1024 * 1024)
-                        lines.append(f"  Free Memory : {free_gb:.2f} GB")
         except:
-            lines.append("  Memory info : Unknown")
-
-        lines.append("")
+            lines.append(f"{node.upper()} : Unable to read information")
 
     return "\n".join(lines)
 
 
 # -------------------------------------------------
-# Main Report Builder
+# NUMA Distance Matrix (Linux Only)
+# -------------------------------------------------
+
+def get_numa_distance():
+    system = platform.system()
+
+    if system != "Linux":
+        return "NUMA distance not supported on this OS."
+
+    base_path = "/sys/devices/system/node/"
+
+    if not os.path.exists(base_path):
+        return "NUMA information not available."
+
+    nodes = sorted([d for d in os.listdir(base_path) if d.startswith("node")])
+
+    if not nodes:
+        return "No NUMA nodes detected."
+
+    lines = []
+    lines.append("NUMA DISTANCE MATRIX")
+    lines.append("-" * 60)
+
+    header = "       " + "  ".join(n.upper() for n in nodes)
+    lines.append(header)
+
+    for node in nodes:
+        distance_path = os.path.join(base_path, node, "distance")
+        try:
+            with open(distance_path) as f:
+                distances = f.read().strip().split()
+            row = f"{node.upper():6}  " + "  ".join(distances)
+            lines.append(row)
+        except:
+            lines.append(f"{node.upper():6}  Unable to read")
+
+    return "\n".join(lines)
+
+
+# -------------------------------------------------
+# Report Builder
 # -------------------------------------------------
 
 def build_report():
     lines = []
-    os_info = get_os_info()
-
     lines.append("=" * 90)
-    lines.append("ADVANCED SYSTEM INFORMATION REPORT")
+    lines.append("SYSTEM INFORMATION REPORT")
     lines.append("=" * 90)
-    lines.append(f"Timestamp      : {datetime.now()}")
-    lines.append(f"Hostname       : {socket.gethostname()}")
-    lines.append(f"Machine        : {platform.machine()}")
-
-    if "pretty_name" in os_info:
-        lines.append(f"OS Pretty Name : {os_info['pretty_name']}")
-
-    lines.append(f"OS Name        : {os_info['os_name']}")
-    lines.append(f"OS Release     : {os_info['release']}")
-    lines.append(f"OS Version     : {os_info['version']}")
-    lines.append(f"Kernel Version : {os_info['kernel']}")
-    lines.append(f"CPU Model      : {get_cpu_model()}")
+    lines.append(f"Generated: {datetime.now()}")
     lines.append("")
 
-    # CPU usage
-    lines.append("-" * 90)
-    lines.append("CPU STATUS")
-    lines.append("-" * 90)
-    lines.append(f"Physical cores : {psutil.cpu_count(logical=False)}")
-    lines.append(f"Total cores    : {psutil.cpu_count(logical=True)}")
-    lines.append(f"CPU usage      : {psutil.cpu_percent(interval=1)} %")
+    # Basic
+    basic = get_basic_info()
+    for k, v in basic.items():
+        lines.append(f"{k:20}: {v}")
     lines.append("")
 
-    # Memory usage
-    mem = psutil.virtual_memory()
+    # CPU
     lines.append("-" * 90)
-    lines.append("MEMORY STATUS")
+    lines.append("CPU INFORMATION")
     lines.append("-" * 90)
-    lines.append(f"Total     : {bytes_to_gb(mem.total):.2f} GB")
-    lines.append(f"Available : {bytes_to_gb(mem.available):.2f} GB")
-    lines.append(f"Used      : {bytes_to_gb(mem.used):.2f} GB")
-    lines.append(f"Usage     : {mem.percent} %")
+    for k, v in get_cpu_info().items():
+        lines.append(f"{k:20}: {v}")
     lines.append("")
 
-    # Disk usage
+    # Memory
     lines.append("-" * 90)
-    lines.append("DISK USAGE")
+    lines.append("MEMORY INFORMATION")
     lines.append("-" * 90)
-    for part in psutil.disk_partitions():
-        try:
-            usage = psutil.disk_usage(part.mountpoint)
-            lines.append(f"{part.device} ({part.mountpoint})")
-            lines.append(
-                f"  Total: {bytes_to_gb(usage.total):.2f} GB | "
-                f"Used: {bytes_to_gb(usage.used):.2f} GB | "
-                f"Free: {bytes_to_gb(usage.free):.2f} GB | "
-                f"Usage: {usage.percent} %"
-            )
-        except PermissionError:
-            continue
+    for k, v in get_memory_info().items():
+        lines.append(f"{k:20}: {v}")
     lines.append("")
 
-    # Extended h/w
+    # Disk
     lines.append("-" * 90)
-    lines.append("EXTENDED DISK HARDWARE INFO")
+    lines.append("DISK INFORMATION")
     lines.append("-" * 90)
-    lines.append(get_disk_info_extended())
-    lines.append("")
+    for disk in get_disk_info():
+        for k, v in disk.items():
+            lines.append(f"{k:20}: {v}")
+        lines.append("")
 
-    lines.append("-" * 90)
-    lines.append("MEMORY MODULE INFO")
-    lines.append("-" * 90)
-    lines.append(get_memory_modules())
-    lines.append("")
-
-    # NUMA info
+    # NUMA Nodes
     lines.append("-" * 90)
     lines.append("NUMA NODE INFORMATION")
     lines.append("-" * 90)
     lines.append(get_numa_info())
     lines.append("")
 
+    # NUMA Distance
+    lines.append("-" * 90)
+    lines.append("NUMA DISTANCE INFORMATION")
+    lines.append("-" * 90)
+    lines.append(get_numa_distance())
+    lines.append("")
+
     return "\n".join(lines)
 
 
-def save_report(content, filename="sysinfo.log"):
-    try:
-        with open(filename, "w", encoding="utf-8") as f:
-            f.write(content)
-    except Exception as e:
-        print("Failed to save file:", e)
-
-
 # -------------------------------------------------
-# Entry Point
+# Main
 # -------------------------------------------------
 
 if __name__ == "__main__":
     report = build_report()
+
     print(report)
-    save_report(report)
-    print("\nReport saved to sysinfo.log")
+
+    with open("sysinfolog.txt", "w") as f:
+        f.write(report)
+
+    print("\nSaved to sysinfolog.txt")
 
 
